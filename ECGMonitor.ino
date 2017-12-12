@@ -8,7 +8,7 @@ int SEC_TO_MIN = 60;
 int MIN_IN_MILLIS = 60000;
 
 int diagnosticLED = 12;
-int ecgAnalogSignalPin = 9;
+int ecgAnalogSignalPin = A5;
 int ecgDigitalSignalPin = 10;
 
 int ledState = LOW;
@@ -26,7 +26,7 @@ unsigned long previousBrachyMillis = 0;
 
 float ecgAnalogSignal = 0;
 float voltage = 0;
-float analog_threshold = 2.0;
+float analog_threshold = .75;
 
 const byte pausePin = 2;
 volatile byte pauseState = LOW;
