@@ -107,7 +107,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   if (currentAnalogMillis - startTime >= (MILLIS_TO_SEC * SEC_TO_MIN)) {
     float analog_avg_hr_val = analog_avg_hr.mean();
     Serial.println(analog_avg_hr_val);
-    startTime = currentAnalogMillis;
+    
 
   }
 }
