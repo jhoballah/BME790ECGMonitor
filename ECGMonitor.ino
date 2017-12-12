@@ -74,7 +74,7 @@ void readECGAnalog() {
   voltage = MAXVOLT*ecgAnalogSignal/1023;
   //begin timer
   currentAnalogMillis = millis();
-  Serial.println(voltage);
+  //Serial.println(voltage);
   
 }
 
@@ -95,7 +95,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
       //send the analog_inst_hr value to the analog_avg_hr array
       analog_avg_hr.push(analog_inst_hr[analog_inst_hr_count]);
-      Serial.println(analog_inst_hr[analog_inst_hr_count]);
+      //Serial.println(analog_inst_hr[analog_inst_hr_count]);
     }
   
     previousTime = currentAnalogMillis;
@@ -106,6 +106,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // currently updates at each minute. Can be updated to calculate it at each new beat
   if (currentAnalogMillis - startTime >= (MILLIS_TO_SEC * SEC_TO_MIN)) {
     float analog_avg_hr_val = analog_avg_hr.mean();
+    Serial.println(analog_avg_hr_val);
     startTime = currentAnalogMillis;
 
   }
