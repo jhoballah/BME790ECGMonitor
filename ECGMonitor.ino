@@ -104,7 +104,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
   // if the current analog millis time is greater than one minute, begin calculating the rolling average
   // currently updates at each minute. Can be updated to calculate it at each new beat
-  if (currentAnalogMillis - startTime >= (MILLIS_TO_SEC * SEC_TO_MIN)) {
+  if (currentAnalogMillis - startTime >= (MIN_IN_MILLIS)) {
     float analog_avg_hr_val = analog_avg_hr.mean();
     Serial.println(analog_avg_hr_val);
     
