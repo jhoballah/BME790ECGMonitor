@@ -30,7 +30,7 @@ unsigned long previousBrachyMillis = 0;
 
 float ecgAnalogSignal = 0;
 float voltage = 0;
-float analog_threshold = .75;
+float analog_threshold = 5*750/1023;
 
 const byte pausePin = 2;
 volatile byte pauseState = LOW;
@@ -132,7 +132,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
 void digitalHRMonitor(unsigned long currentDigitalMillis) {
   if (digitalSignalState  != HIGH) {
-    delay(10);
+    delay(20);
     // update counter when monitor finds that a beat has been measured
     digital_beat_counter++;
     float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
