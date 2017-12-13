@@ -35,7 +35,7 @@ float analog_threshold = 5*750/1023;
 const byte pausePin = 2;
 volatile byte pauseState = LOW;
 const byte comparatorPin = 3;
-int digitalSignalState = HIGH;
+volatile byte digitalSignalState = HIGH;
 
 // holds the analog_avg_hr using the Average library
 Average<float> analog_avg_hr(30);
@@ -51,14 +51,15 @@ void setup() {
   
   // add pause interrupt
   attachInterrupt(digitalPinToInterrupt(pausePin), pause, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(comparatorPin), digitalpeakfinder, CHANGE);
   Serial.begin(9600);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   if (pauseState != HIGH){
-    readECGDigital();
-    digitalHRMonitor(currentDigitalMillis);  
+//    readECGDigital();
+    digitalHRMonitor(digitalSignalState, currentDigitalMillis);  
     readECGAnalog();
     analogHRMonitor(currentAnalogMillis);
   }
@@ -88,13 +89,13 @@ void readECGAnalog() {
   
 }
 
-void readECGDigital() {
-
-  // read digital signal from digital signal pin
-  digitalSignalState = digitalRead(ecgDigitalSignalPin);
-  currentDigitalMillis = millis();
-  //Serial.println(digitalSignalState);
-}
+//void readECGDigital() {
+//
+//  // read digital signal from digital signal pin
+//  digitalSignalState = digitalRead(ecgDigitalSignalPin);
+//  currentDigitalMillis = millis();
+//  //Serial.println(digitalSignalState);
+//}
 
 
 void analogHRMonitor(unsigned long currentAnalogMillis) {
@@ -130,9 +131,9 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   }
 }
 
-void digitalHRMonitor(unsigned long currentDigitalMillis) {
+void digitalHRMonitor(volatile byte digitalSignalState, unsigned long currentDigitalMillis) {
   if (digitalSignalState  != HIGH) {
-    delay(20);
+    
     // update counter when monitor finds that a beat has been measured
     digital_beat_counter++;
     float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
@@ -198,6 +199,11 @@ void blinkLED(unsigned long previousMillis, unsigned long interval) {
 
 void pause() {
 pauseState = ! pauseState;
+  
+}
+
+void digitalpeakfinder() {
+  digitalSignalState = ! digitalSignalState;
   
 }
 
