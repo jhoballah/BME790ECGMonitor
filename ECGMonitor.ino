@@ -15,9 +15,13 @@ int ledState = LOW;
 
 int analog_beat_counter = 0;
 int analog_inst_hr_count = 0;
+int digital_beat_counter = 0;
+int digital_inst_hr_count = 0;
 
 unsigned long currentAnalogMillis = 0;
-unsigned long previousTime = 0;
+unsigned long currentDigitalMillis = 0;
+unsigned long previousTimeAnalog = 0;
+unsigned long previousTimeDigital = 0;
 unsigned long startTime = 0;
 unsigned long tachyInterval = 50;
 unsigned long brachyInterval = 250;
@@ -30,10 +34,14 @@ float analog_threshold = .75;
 
 const byte pausePin = 2;
 volatile byte pauseState = LOW;
+const byte comparatorPin = 3;
+int digitalSignalState = HIGH;
 
 // holds the analog_avg_hr using the Average library
 Average<float> analog_avg_hr(30);
+Average<float> digital_avg_hr(30);
 
+void pause();
 
 void setup() {
   // put your setup code here, to run once:
@@ -49,6 +57,8 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   if (pauseState != HIGH){
+    readECGDigital();
+    digitalHRMonitor(currentDigitalMillis);  
     readECGAnalog();
     analogHRMonitor(currentAnalogMillis);
   }
@@ -78,6 +88,14 @@ void readECGAnalog() {
   
 }
 
+void readECGDigital() {
+
+  // read digital signal from digital signal pin
+  digitalSignalState = digitalRead(ecgDigitalSignalPin);
+  currentDigitalMillis = millis();
+  //Serial.println(digitalSignalState);
+}
+
 
 void analogHRMonitor(unsigned long currentAnalogMillis) {
   // check if voltage is above a specific threshold, can be modified from analog_threshold var at top of code
@@ -85,7 +103,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
     delay(250);
     // update counter when monitor finds that a beat has been measured
     analog_beat_counter++;
-    float analog_interval_hr[analog_beat_counter] = {1./ ((currentAnalogMillis - previousTime) / MILLIS_TO_SEC)*SEC_TO_MIN};
+    float analog_interval_hr[analog_beat_counter] = {1./ ((currentAnalogMillis - previousTimeAnalog) / MILLIS_TO_SEC)*SEC_TO_MIN};
 
     // update instantaneous heart rate count when there are at least two beats identified
     if (analog_beat_counter >= 2) {
@@ -98,7 +116,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
       //Serial.println(analog_inst_hr[analog_inst_hr_count]);
     }
   
-    previousTime = currentAnalogMillis;
+    previousTimeAnalog = currentAnalogMillis;
     
   }
 
@@ -106,16 +124,42 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // currently updates at each minute. Can be updated to calculate it at each new beat
   if (currentAnalogMillis - startTime >= (MIN_IN_MILLIS)) {
     float analog_avg_hr_val = analog_avg_hr.mean();
-    Serial.println(analog_avg_hr_val);
+    //Serial.println(analog_avg_hr_val);
     
 
   }
 }
 
-void readECGdigital() {
+void digitalHRMonitor(unsigned long currentDigitalMillis) {
+  if (digitalSignalState  != HIGH) {
+    delay(10);
+    // update counter when monitor finds that a beat has been measured
+    digital_beat_counter++;
+    float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
+
+    // update instantaneous heart rate count when there are at least two beats identified
+    if (digital_beat_counter >= 2) {
+      digital_inst_hr_count++;
+      //calculate instantaneous heart rate
+      float digital_inst_hr[digital_inst_hr_count] = {(digital_interval_hr[1] + digital_interval_hr[2])/2};
+
+      //send the analog_inst_hr value to the analog_avg_hr array
+      digital_avg_hr.push(digital_inst_hr[digital_inst_hr_count]);
+      Serial.println(digital_inst_hr[digital_inst_hr_count]);
+    }
   
+    previousTimeDigital = currentDigitalMillis;
+    
+  }
+
+  // if the current digital millis time is greater than one minute, begin calculating the rolling average
+  // currently updates at each minute. Can be updated to calculate it at each new beat
+  if (currentDigitalMillis - startTime >= (MIN_IN_MILLIS)) {
+    float digital_avg_hr_val = digital_avg_hr.mean();
+    //Serial.println(digital_avg_hr_val);
 
   
+  }
 }
 
 
