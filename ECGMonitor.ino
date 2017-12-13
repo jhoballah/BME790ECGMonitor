@@ -58,7 +58,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   if (pauseState != HIGH){
-//    readECGDigital();
+    readECGDigital();
     digitalHRMonitor(digitalSignalState, currentDigitalMillis);  
     readECGAnalog();
     analogHRMonitor(currentAnalogMillis);
@@ -89,13 +89,13 @@ void readECGAnalog() {
   
 }
 
-//void readECGDigital() {
-//
-//  // read digital signal from digital signal pin
-//  digitalSignalState = digitalRead(ecgDigitalSignalPin);
-//  currentDigitalMillis = millis();
-//  //Serial.println(digitalSignalState);
-//}
+void readECGDigital() {
+
+  // read digital signal from digital signal pin
+  
+  currentDigitalMillis = millis();
+  //Serial.println(digitalSignalState);
+}
 
 
 void analogHRMonitor(unsigned long currentAnalogMillis) {
