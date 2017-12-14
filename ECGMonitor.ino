@@ -44,8 +44,8 @@ volatile byte pauseState = LOW;
 float hrVal = 0;
 
 // holds the analog_avg_hr using the Average library
-RunningAverage analog_avg_hr(30);
-RunningAverage digital_avg_hr(30);
+RunningAverage analog_avg_hr(60);
+RunningAverage digital_avg_hr(60);
 
 void pause();
 
