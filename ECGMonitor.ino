@@ -145,6 +145,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   if (currentAnalogMillis - startTimeAnalog >= (MIN_IN_MILLIS)) {
     float analog_avg_hr_val = analog_avg_hr.getAverage();
     Serial.println(analog_avg_hr_val);
+    analog_avg_hr.clear();
     startTimeAnalog = currentAnalogMillis;
     
   }
@@ -175,9 +176,10 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
 
   // if the current digital millis time is greater than one minute, begin calculating the rolling average
   // currently updates at each minute. 
-  if (currentDigitalMillis - startTime >= (MIN_IN_MILLIS)) {
+  if (currentDigitalMillis - startTimeDigital >= (MIN_IN_MILLIS)) {
     float digital_avg_hr_val = digital_avg_hr.getAverage();
     startTimeDigital = currentDigitalMillis;
+    digital_avg_hr.clear();
     //Serial.println(digital_avg_hr_val);
 
   
