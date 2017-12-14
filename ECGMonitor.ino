@@ -23,7 +23,8 @@ unsigned long currentAnalogMillis = 0;
 unsigned long currentDigitalMillis = 0;
 unsigned long previousTimeAnalog = 0;
 unsigned long previousTimeDigital = 0;
-unsigned long startTime = 0;
+unsigned long startTimeDigital = 0;
+unsigned long startTimeAnalog = 0;
 unsigned long tachyInterval = 50;
 unsigned long brachyInterval = 250;
 unsigned long previousLEDMillis = 0;
@@ -141,9 +142,10 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
   // if the current analog millis time is greater than one minute, begin calculating the rolling average
   // currently updates at each minute. Can be updated to calculate it at each new beat
-  if (currentAnalogMillis - startTime >= (MIN_IN_MILLIS)) {
+  if (currentAnalogMillis - startTimeAnalog >= (MIN_IN_MILLIS)) {
     float analog_avg_hr_val = analog_avg_hr.getAverage();
-    //Serial.println(analog_avg_hr_val);
+    Serial.println(analog_avg_hr_val);
+    startTimeAnalog = currentAnalogMillis;
     
   }
   prev_voltage = voltage;
@@ -164,7 +166,7 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
 
       //send the analog_inst_hr value to the analog_avg_hr array
       digital_avg_hr.addValue(digital_inst_hr[digital_inst_hr_count]);
-      Serial.println(digital_inst_hr[digital_inst_hr_count]);
+      //Serial.println(digital_inst_hr[digital_inst_hr_count]);
     }
   
     previousTimeDigital = currentDigitalMillis;
@@ -172,10 +174,10 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
   }
 
   // if the current digital millis time is greater than one minute, begin calculating the rolling average
-  // currently updates at each minute. Can be updated to calculate it at each new beat
+  // currently updates at each minute. 
   if (currentDigitalMillis - startTime >= (MIN_IN_MILLIS)) {
     float digital_avg_hr_val = digital_avg_hr.getAverage();
-    startTime = currentDigitalMillis;
+    startTimeDigital = currentDigitalMillis;
     //Serial.println(digital_avg_hr_val);
 
   
