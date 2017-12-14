@@ -175,6 +175,7 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
   // currently updates at each minute. Can be updated to calculate it at each new beat
   if (currentDigitalMillis - startTime >= (MIN_IN_MILLIS)) {
     float digital_avg_hr_val = digital_avg_hr.getAverage();
+    startTime = currentDigitalMillis;
     //Serial.println(digital_avg_hr_val);
 
   
