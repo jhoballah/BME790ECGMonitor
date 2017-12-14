@@ -118,7 +118,6 @@ void readECGDigital() {
 void analogHRMonitor(unsigned long currentAnalogMillis) {
   // check if voltage is above a specific threshold, can be modified from analog_threshold var at top of code
   if (voltage > analog_threshold && prev_voltage < voltage ) {
-    delay(250);
     // update counter when monitor finds that a beat has been measured
     analog_beat_counter++;
     float analog_interval_hr[analog_beat_counter] = {1./ ((currentAnalogMillis - previousTimeAnalog) / MILLIS_TO_SEC)*SEC_TO_MIN};
