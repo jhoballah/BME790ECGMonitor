@@ -154,24 +154,24 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
 void digitalHRMonitor(unsigned long currentDigitalMillis) {
   if (ecgDigitalSignal  == LOW && prev_ecgDigitalSignal == HIGH) {
-    
-    // update counter when monitor finds that a beat has been measured
-    digital_beat_counter++;
-    float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
-
-    // update instantaneous heart rate count when there are at least two beats identified
-    if (digital_beat_counter >= 2) {
-      digital_inst_hr_count++;
-      //calculate instantaneous heart rate
-      float digital_inst_hr[digital_inst_hr_count] = {(digital_interval_hr[1] + digital_interval_hr[2])/2};
-
-      //send the analog_inst_hr value to the analog_avg_hr array
-      digital_avg_hr.addValue(digital_inst_hr[digital_inst_hr_count]);
-      //Serial.println(digital_inst_hr[digital_inst_hr_count]);
-    }
+    if (currentAnalogMillis - previousTimeAnalog >= 100) {
+      // update counter when monitor finds that a beat has been measured
+      digital_beat_counter++;
+      float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
+  
+      // update instantaneous heart rate count when there are at least two beats identified
+      if (digital_beat_counter >= 2) {
+        digital_inst_hr_count++;
+        //calculate instantaneous heart rate
+        float digital_inst_hr[digital_inst_hr_count] = {(digital_interval_hr[1] + digital_interval_hr[2])/2};
+  
+        //send the analog_inst_hr value to the analog_avg_hr array
+        digital_avg_hr.addValue(digital_inst_hr[digital_inst_hr_count]);
+        //Serial.println(digital_inst_hr[digital_inst_hr_count]);
+      }
   
     previousTimeDigital = currentDigitalMillis;
-    
+    }  
   }
 
   // if the current digital millis time is greater than one minute, begin calculating the rolling average
