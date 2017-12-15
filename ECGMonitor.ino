@@ -154,7 +154,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
 void digitalHRMonitor(unsigned long currentDigitalMillis) {
   if (ecgDigitalSignal  == LOW && prev_ecgDigitalSignal == HIGH) {
-    if (currentAnalogMillis - previousTimeAnalog >= 100) {
+    if (currentDigitalMillis - previousTimeDigital >= 100) {
       // update counter when monitor finds that a beat has been measured
       digital_beat_counter++;
       float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
