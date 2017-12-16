@@ -71,7 +71,7 @@ void loop() {
 
     readECGDigital();
     digitalHRMonitor(currentDigitalMillis);  
-    if (analog_inst_hr_count != 0) {
+    if (hrVal != 0) {
       diagnosis(hrVal);  
     }
     
@@ -133,10 +133,11 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
         //calculate instantaneous heart rate
         float analog_inst_hr[analog_inst_hr_count] = {(analog_interval_hr[1] + analog_interval_hr[2])/2};
         if (analog_inst_hr[analog_inst_hr_count] != INFINITY) {
-          hrVal = analog_inst_hr[analog_inst_hr_count];
+          
           //send the analog_inst_hr value to the analog_avg_hr array
           analog_avg_hr.addValue(analog_inst_hr[analog_inst_hr_count]);
-          //Serial.println(analog_inst_hr[analog_inst_hr_count]);
+          Serial.print("Analog Inst HR: ");
+          Serial.println(analog_inst_hr[analog_inst_hr_count]);
         }
         
       }
@@ -150,6 +151,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // currently updates at each minute. Can be updated to calculate it at each new beat
   if (currentAnalogMillis - startTimeAnalog >= (MIN_IN_MILLIS)) {
     float analog_avg_hr_val = analog_avg_hr.getAverage();
+    hrVal = analog_avg_hr_val;
     Serial.print("Analog AVGHR: ");
     Serial.println(analog_avg_hr_val);
     analog_avg_hr.clear();
@@ -174,7 +176,8 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
         if (digital_inst_hr[digital_inst_hr_count] != INFINITY) {
           //send the analog_inst_hr value to the analog_avg_hr array
           digital_avg_hr.addValue(digital_inst_hr[digital_inst_hr_count]);
-          //Serial.println(digital_inst_hr[digital_inst_hr_count]);
+          Serial.print("Digital InstHR: ");
+          Serial.println(digital_inst_hr[digital_inst_hr_count]);
           
         }
         
