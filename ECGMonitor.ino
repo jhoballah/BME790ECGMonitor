@@ -125,7 +125,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
     // update counter when monitor finds that a beat has been measured
     if ((currentAnalogMillis - previousTimeAnalog) >= TIME_THRESHOLD) {
       analog_beat_counter++;
-      float analog_interval_hr[analog_beat_counter] = {1./ ((currentAnalogMillis - previousTimeAnalog) / MILLIS_TO_SEC)*SEC_TO_MIN};
+      float analog_interval_hr[analog_beat_counter] = {1* MIN_IN_MILLIS / (currentAnalogMillis - previousTimeAnalog)};
   
       // update instantaneous heart rate count when there are at least two beats identified
       if (analog_beat_counter >= 2) {
@@ -166,7 +166,7 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
     if ((currentDigitalMillis - previousTimeDigital) >= TIME_THRESHOLD){
       // update counter when monitor finds that a beat has been measured
       digital_beat_counter++;
-      float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
+      float digital_interval_hr[digital_beat_counter] = {1* MIN_IN_MILLIS / (currentDigitalMillis - previousTimeDigital)};
   
       // update instantaneous heart rate count when there are at least two beats identified
       if (digital_beat_counter >= 2) {
