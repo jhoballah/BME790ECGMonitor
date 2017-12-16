@@ -1,5 +1,6 @@
 #include "RunningAverage.h"
 
+// define all constants 
 const float brachyLim = 40.0;
 const float tachyLim = 180.0;
 const int rolling_average_size = 30;
@@ -9,17 +10,20 @@ const int SEC_TO_MIN = 60;
 const long MIN_IN_MILLIS = 60000;
 const int TIME_THRESHOLD = 200;
 
+// set input signal pins
 const int diagnosticLED = 12;
 const int ecgAnalogSignalPin = A5;
 const int ecgDigitalSignalPin = 10;
 
 int ledState = LOW;
 
+// initialize counters for analog and digital HR monitor functions
 int analog_beat_counter = 0;
 int analog_inst_hr_count = 0;
 int digital_beat_counter = 0;
 int digital_inst_hr_count = 0;
 
+// initialize all times for calculating beat intervals
 unsigned long currentAnalogMillis = 0;
 unsigned long currentDigitalMillis = 0;
 unsigned long previousTimeAnalog = 0;
@@ -30,21 +34,26 @@ unsigned long tachyInterval = 50;
 unsigned long brachyInterval = 250;
 unsigned long previousLEDMillis = 0;
 
+// initialize analog signal reading and voltage values
 float ecgAnalogSignal = 0;
 float voltage = 0;
 float prev_voltage = 0;
 
+// set threshold for analog signal based upon analog output, can be modified as needed
 float analog_threshold = 5*860/1023;
 
+// initialize digital signal values
 int ecgDigitalSignal = HIGH;
 int prev_ecgDigitalSignal = HIGH;
 
+// initialize pause state pin and state
 const byte pausePin = 2;
 volatile byte pauseState = LOW;
 
+// heart rate value used for diagnosis of tachycardia and brachycardia
 float hrVal = 0;
 
-// holds the analog_avg_hr using the Average library
+// holds the analog_avg_hr using the RunningAverage library
 RunningAverage analog_avg_hr(60);
 RunningAverage digital_avg_hr(60);
 
@@ -130,8 +139,10 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
       // update instantaneous heart rate count when there are at least two beats identified
       if (analog_beat_counter >= 2) {
         analog_inst_hr_count++;
-        //calculate instantaneous heart rate
+        //calculate instantaneous heart rate based upon two beats
         float analog_inst_hr[analog_inst_hr_count] = {(analog_interval_hr[1] + analog_interval_hr[2])/2};
+        
+        //check to ensure that the instHR value is not infinity to avoid an infinite average value
         if (analog_inst_hr[analog_inst_hr_count] != INFINITY) {
           
           //send the analog_inst_hr value to the analog_avg_hr array
@@ -154,8 +165,10 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
     hrVal = analog_avg_hr_val;
     Serial.print("Analog AVGHR: ");
     Serial.println(analog_avg_hr_val);
-    analog_avg_hr.clear();
     startTimeAnalog = currentAnalogMillis;
+    //clear array after each minute to ensure it doesn't overflow over time
+    analog_avg_hr.clear();
+    
     
   }
   prev_voltage = voltage;
@@ -171,10 +184,12 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
       // update instantaneous heart rate count when there are at least two beats identified
       if (digital_beat_counter >= 2) {
         digital_inst_hr_count++;
-        //calculate instantaneous heart rate
+        //calculate instantaneous heart rate based upon two beats
         float digital_inst_hr[digital_inst_hr_count] = {(digital_interval_hr[1] + digital_interval_hr[2])/2};
+
+        //check to ensure that the instHR value is not infinity to avoid an infinite average value
         if (digital_inst_hr[digital_inst_hr_count] != INFINITY) {
-          //send the analog_inst_hr value to the analog_avg_hr array
+          //send the digital_inst_hr value to the digital_avg_hr array
           digital_avg_hr.addValue(digital_inst_hr[digital_inst_hr_count]);
           Serial.print("Digital InstHR: ");
           Serial.println(digital_inst_hr[digital_inst_hr_count]);
@@ -194,6 +209,7 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
     Serial.print("Digital AVGHR: ");
     Serial.println(digital_avg_hr_val);
     startTimeDigital = currentDigitalMillis;
+    //clear array after each minute to ensure it doesn't overflow over time
     digital_avg_hr.clear();
     
 
@@ -203,7 +219,7 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
 }
 
 
-// Still need to fix diagnosis to blink LEDs appropriately
+// Needs to be tested
 void diagnosis(float hrVal) {
 
   if (hrVal < brachyLim) {
