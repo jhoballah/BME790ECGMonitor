@@ -141,7 +141,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
         analog_inst_hr_count++;
         //calculate instantaneous heart rate based upon two beats
         float analog_inst_hr[analog_inst_hr_count] = {(analog_interval_hr[1] + analog_interval_hr[2])/2};
-        
+        hrVal = analog_inst_hr[analog_inst_hr_count];
         //check to ensure that the instHR value is not infinity to avoid an infinite average value
         if (analog_inst_hr[analog_inst_hr_count] != INFINITY) {
           
@@ -162,7 +162,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // currently updates at each minute. Can be updated to calculate it at each new beat
   if (currentAnalogMillis - startTimeAnalog >= (MIN_IN_MILLIS)) {
     float analog_avg_hr_val = analog_avg_hr.getAverage();
-    hrVal = analog_avg_hr_val;
+    
     Serial.print("Analog AVGHR: ");
     Serial.println(analog_avg_hr_val);
     startTimeAnalog = currentAnalogMillis;
