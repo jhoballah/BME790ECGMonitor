@@ -33,7 +33,7 @@ float ecgAnalogSignal = 0;
 float voltage = 0;
 float prev_voltage = 0;
 
-float analog_threshold = 5*800/1023;
+float analog_threshold = 5*860/1023;
 
 int ecgDigitalSignal = HIGH;
 int prev_ecgDigitalSignal = HIGH;
@@ -64,10 +64,13 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   if (pauseState != HIGH){
-    readECGDigital();
-    digitalHRMonitor(currentDigitalMillis);  
+    
     readECGAnalog();
     analogHRMonitor(currentAnalogMillis);
+
+    readECGDigital();
+    digitalHRMonitor(currentDigitalMillis);
+    
     if (analog_inst_hr_count != 0) {
       diagnosis(hrVal);  
     }
@@ -120,7 +123,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // check if voltage is above a specific threshold, can be modified from analog_threshold var at top of code
   if (voltage < analog_threshold && prev_voltage > analog_threshold ) {
     // update counter when monitor finds that a beat has been measured
-    if ((currentAnalogMillis - previousTimeAnalog) >= 200) {
+    if ((currentAnalogMillis - previousTimeAnalog) >= 200 && (previousTimeAnalog != 0)) {
       analog_beat_counter++;
       float analog_interval_hr[analog_beat_counter] = {1./ ((currentAnalogMillis - previousTimeAnalog) / MILLIS_TO_SEC)*SEC_TO_MIN};
   
@@ -144,6 +147,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // currently updates at each minute. Can be updated to calculate it at each new beat
   if (currentAnalogMillis - startTimeAnalog >= (MIN_IN_MILLIS)) {
     float analog_avg_hr_val = analog_avg_hr.getAverage();
+    Serial.print("Analog AVGHR: ");
     Serial.println(analog_avg_hr_val);
     analog_avg_hr.clear();
     startTimeAnalog = currentAnalogMillis;
@@ -154,7 +158,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
 void digitalHRMonitor(unsigned long currentDigitalMillis) {
   if (ecgDigitalSignal  == LOW && prev_ecgDigitalSignal == HIGH) {
-    if ((currentDigitalMillis - previousTimeDigital) >= 200) {
+    if ((currentDigitalMillis - previousTimeDigital) >= 200 && (previousTimeDigital != 0)) {
       // update counter when monitor finds that a beat has been measured
       digital_beat_counter++;
       float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
@@ -178,9 +182,11 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
   // currently updates at each minute. 
   if (currentDigitalMillis - startTimeDigital >= (MIN_IN_MILLIS)) {
     float digital_avg_hr_val = digital_avg_hr.getAverage();
+    Serial.print("Digital AVGHR: ");
+    Serial.println(digital_avg_hr_val);
     startTimeDigital = currentDigitalMillis;
     digital_avg_hr.clear();
-    //Serial.println(digital_avg_hr_val);
+    
 
   
   }
