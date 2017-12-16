@@ -67,7 +67,7 @@ void setup() {
   avgHRArraySetup();
   
   // add pause interrupt
-  attachInterrupt(digitalPinToInterrupt(pausePin), pause, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(pausePin), pause, HIGH);
   Serial.begin(9600);
 }
 
