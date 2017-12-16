@@ -7,6 +7,7 @@ const int MAXVOLT = 5;
 const long MILLIS_TO_SEC = 1000;
 const int SEC_TO_MIN = 60;
 const long MIN_IN_MILLIS = 60000;
+const int TIME_THRESHOLD = 200;
 
 const int diagnosticLED = 12;
 const int ecgAnalogSignalPin = A5;
@@ -69,8 +70,7 @@ void loop() {
     analogHRMonitor(currentAnalogMillis);
 
     readECGDigital();
-    digitalHRMonitor(currentDigitalMillis);
-    
+    digitalHRMonitor(currentDigitalMillis);  
     if (analog_inst_hr_count != 0) {
       diagnosis(hrVal);  
     }
@@ -123,7 +123,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // check if voltage is above a specific threshold, can be modified from analog_threshold var at top of code
   if (voltage < analog_threshold && prev_voltage > analog_threshold ) {
     // update counter when monitor finds that a beat has been measured
-    if ((currentAnalogMillis - previousTimeAnalog) >= 200 && (previousTimeAnalog != 0)) {
+    if ((currentAnalogMillis - previousTimeAnalog) >= TIME_THRESHOLD) {
       analog_beat_counter++;
       float analog_interval_hr[analog_beat_counter] = {1./ ((currentAnalogMillis - previousTimeAnalog) / MILLIS_TO_SEC)*SEC_TO_MIN};
   
@@ -132,10 +132,13 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
         analog_inst_hr_count++;
         //calculate instantaneous heart rate
         float analog_inst_hr[analog_inst_hr_count] = {(analog_interval_hr[1] + analog_interval_hr[2])/2};
-        hrVal = analog_inst_hr[analog_inst_hr_count];
-        //send the analog_inst_hr value to the analog_avg_hr array
-        analog_avg_hr.addValue(analog_inst_hr[analog_inst_hr_count]);
-        //Serial.println(analog_inst_hr[analog_inst_hr_count]);
+        if (analog_inst_hr[analog_inst_hr_count] != INFINITY) {
+          hrVal = analog_inst_hr[analog_inst_hr_count];
+          //send the analog_inst_hr value to the analog_avg_hr array
+          analog_avg_hr.addValue(analog_inst_hr[analog_inst_hr_count]);
+          //Serial.println(analog_inst_hr[analog_inst_hr_count]);
+        }
+        
       }
     
       previousTimeAnalog = currentAnalogMillis;
@@ -158,7 +161,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
 void digitalHRMonitor(unsigned long currentDigitalMillis) {
   if (ecgDigitalSignal  == LOW && prev_ecgDigitalSignal == HIGH) {
-    if ((currentDigitalMillis - previousTimeDigital) >= 200 && (previousTimeDigital != 0)) {
+    if ((currentDigitalMillis - previousTimeDigital) >= TIME_THRESHOLD){
       // update counter when monitor finds that a beat has been measured
       digital_beat_counter++;
       float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
