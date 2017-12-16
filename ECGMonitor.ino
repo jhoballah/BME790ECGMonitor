@@ -33,7 +33,7 @@ float ecgAnalogSignal = 0;
 float voltage = 0;
 float prev_voltage = 0;
 
-float analog_threshold = 5*750/1023;
+float analog_threshold = 5*800/1023;
 
 int ecgDigitalSignal = HIGH;
 int prev_ecgDigitalSignal = HIGH;
@@ -120,7 +120,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
   // check if voltage is above a specific threshold, can be modified from analog_threshold var at top of code
   if (voltage < analog_threshold && prev_voltage > analog_threshold ) {
     // update counter when monitor finds that a beat has been measured
-    if (currentAnalogMillis - previousTimeAnalog >= 100) {
+    if ((currentAnalogMillis - previousTimeAnalog) >= 200) {
       analog_beat_counter++;
       float analog_interval_hr[analog_beat_counter] = {1./ ((currentAnalogMillis - previousTimeAnalog) / MILLIS_TO_SEC)*SEC_TO_MIN};
   
@@ -154,7 +154,7 @@ void analogHRMonitor(unsigned long currentAnalogMillis) {
 
 void digitalHRMonitor(unsigned long currentDigitalMillis) {
   if (ecgDigitalSignal  == LOW && prev_ecgDigitalSignal == HIGH) {
-    if (currentDigitalMillis - previousTimeDigital >= 100) {
+    if ((currentDigitalMillis - previousTimeDigital) >= 200) {
       // update counter when monitor finds that a beat has been measured
       digital_beat_counter++;
       float digital_interval_hr[digital_beat_counter] = {1./ ((currentDigitalMillis - previousTimeDigital) / MILLIS_TO_SEC)*SEC_TO_MIN};
