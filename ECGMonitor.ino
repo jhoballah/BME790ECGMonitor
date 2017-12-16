@@ -171,10 +171,13 @@ void digitalHRMonitor(unsigned long currentDigitalMillis) {
         digital_inst_hr_count++;
         //calculate instantaneous heart rate
         float digital_inst_hr[digital_inst_hr_count] = {(digital_interval_hr[1] + digital_interval_hr[2])/2};
-  
-        //send the analog_inst_hr value to the analog_avg_hr array
-        digital_avg_hr.addValue(digital_inst_hr[digital_inst_hr_count]);
-        //Serial.println(digital_inst_hr[digital_inst_hr_count]);
+        if (digital_inst_hr[digital_inst_hr_count] != INFINITY) {
+          //send the analog_inst_hr value to the analog_avg_hr array
+          digital_avg_hr.addValue(digital_inst_hr[digital_inst_hr_count]);
+          //Serial.println(digital_inst_hr[digital_inst_hr_count]);
+          
+        }
+        
       }
   
     previousTimeDigital = currentDigitalMillis;
